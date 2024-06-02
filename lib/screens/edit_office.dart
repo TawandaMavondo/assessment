@@ -1,5 +1,6 @@
 import 'package:assessment/dto/company_dto.dart';
 import 'package:assessment/service/company_service.dart';
+import 'package:assessment/utils/extensions.dart';
 import 'package:flex_color_picker/flex_color_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -7,14 +8,15 @@ import 'package:uuid/uuid.dart';
 
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 
-class NewOfficeScreen extends StatefulWidget {
-  const NewOfficeScreen({super.key});
+class EditOfficeScreen extends StatefulWidget {
+  final CompanyDTO dto;
+  const EditOfficeScreen({super.key, required this.dto});
 
   @override
-  State<NewOfficeScreen> createState() => _NewOfficeScreenState();
+  State<EditOfficeScreen> createState() => _EditOfficeScreenState();
 }
 
-class _NewOfficeScreenState extends State<NewOfficeScreen> {
+class _EditOfficeScreenState extends State<EditOfficeScreen> {
   TextEditingController officeNameController = TextEditingController();
   TextEditingController physicalAddressController = TextEditingController();
   TextEditingController emailAddressController = TextEditingController();
@@ -23,12 +25,21 @@ class _NewOfficeScreenState extends State<NewOfficeScreen> {
 
   late Color officeColor;
 
-  Future<void> addNewOffice() async {
-    // Add new office to the database
-    var uuid = const Uuid();
+  @override
+  void initState() {
+    super.initState();
+    officeNameController.text = widget.dto.name;
+    physicalAddressController.text = widget.dto.address;
+    emailAddressController.text = widget.dto.email;
+    phoneNumberController.text = widget.dto.phone;
+    memberCapacityController.text = widget.dto.capacity.toString();
+    officeColor = HexColor.fromHex(widget.dto.color);
+  }
 
+  Future<void> updateOffice() async {
+    // Update office in the database
     CompanyDTO companyDTO = CompanyDTO(
-      id: uuid.v4(),
+      id: widget.dto.id,
       name: officeNameController.text,
       address: physicalAddressController.text,
       email: emailAddressController.text,
@@ -38,18 +49,23 @@ class _NewOfficeScreenState extends State<NewOfficeScreen> {
     );
 
     var service = CompanyService();
-    await service.createCompany(companyDTO.toMap());
-    // ignore: use_build_context_synchronously
+    await service.updateCompany(widget.dto.id, companyDTO.toMap());
     context.pop();
   }
 
+Future<void> deleteOffice() async {
+    // Delete office in the database
+    var service = CompanyService();
+    await service.deleteCompany(widget.dto.id);
+    context.pop();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
         automaticallyImplyLeading: true,
-        title: const Text("New Office "),
+        title: const Text("Edit Office "),
       ),
       body: SingleChildScrollView(
         child: Container(
@@ -127,7 +143,7 @@ class _NewOfficeScreenState extends State<NewOfficeScreen> {
                   height: 16,
                 ),
                 BlockPicker(
-                  pickerColor: Colors.blue,
+                  pickerColor: officeColor,
                   useInShowDialog: true,
                   availableColors: const [
                     Color(0xffFFBE0B),
@@ -155,9 +171,22 @@ class _NewOfficeScreenState extends State<NewOfficeScreen> {
                         backgroundColor: const Color(0xFF489DDA),
                         foregroundColor: Colors.white),
                     onPressed: () async {
-                      await addNewOffice();
+                      await updateOffice();
                     },
-                    child: const Text("Add Office"),
+                    child: const Text("Update Office"),
+                  ),
+                ),
+                SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.9,
+                  child: TextButton(
+                    style: TextButton.styleFrom(
+                        // backgroundColor: const Color(0xFF489DDA),
+                        foregroundColor: Color(0xFF489DDA)),
+                    onPressed: () async {
+                      // await addNewOffice();
+                      await deleteOffice();
+                    },
+                    child: const Text("Delete Office"),
                   ),
                 ),
                 const SizedBox(

@@ -1,3 +1,4 @@
+import 'package:assessment/dto/company_dto.dart';
 import 'package:assessment/utils/floating_action_button.dart';
 import 'package:assessment/widgets/expansion_card.dart';
 import 'package:flutter/gestures.dart';
@@ -5,8 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
 class OfficeScreen extends StatefulWidget {
-  final String id;
-  const OfficeScreen({super.key, required this.id});
+
+  final CompanyDTO dto;
+  const OfficeScreen({super.key, required this.dto});
 
   @override
   State<OfficeScreen> createState() => _OfficeScreenState();
@@ -36,7 +38,7 @@ class _OfficeScreenState extends State<OfficeScreen> {
                             foregroundColor: Colors.white),
                         onPressed: () {
                           _controller.nextPage(
-                              duration: Duration(
+                              duration: const Duration(
                                 milliseconds: 500,
                               ),
                               curve: Curves.easeIn);
@@ -79,7 +81,7 @@ class _OfficeScreenState extends State<OfficeScreen> {
               horizontal: 10,
             ),
             child: Column(children: [
-              // ExpansionCard(),
+              ExpansionCard(dto: widget.dto),
               const SizedBox(
                 height: 16,
               ),

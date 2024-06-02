@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:assessment/service/company_service.dart';
 import 'package:assessment/utils/floating_action_button.dart';
 import 'package:assessment/widgets/expansion_card.dart';
@@ -39,28 +41,39 @@ class _HomeScreenState extends State<HomeScreen> {
           padding: const EdgeInsets.only(
             top: 12,
           ),
-          child: FutureBuilder(
-            future: getIt<CompanyService>().readCompanies(),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(
-                  child: CircularProgressIndicator(),
-                );
-              } else {
-                if (snapshot.hasError) {
+          child: RefreshIndicator(
+            onRefresh: () {
+              setState(() {});
+              return Future.value();
+            },
+            child: FutureBuilder(
+              future: Future.delayed(
+                  const Duration(seconds: 1),
+                  () async {
+                    var service = CompanyService();
+                    return await service.readCompanies();
+                  } as FutureOr Function()?),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(
-                    child: Text('Error fetching data'),
+                    child: CircularProgressIndicator(),
                   );
                 } else {
-                  return ListView.builder(
-                    itemCount: snapshot.data?.length,
-                    itemBuilder: (context, index) {
-                      return ExpansionCard(dto: snapshot.data![index]);
-                    },
-                  );
+                  if (snapshot.hasError) {
+                    return const Center(
+                      child: Text('Error fetching data'),
+                    );
+                  } else {
+                    return ListView.builder(
+                      itemCount: snapshot.data?.length,
+                      itemBuilder: (context, index) {
+                        return ExpansionCard(dto: snapshot.data![index]);
+                      },
+                    );
+                  }
                 }
-              }
-            },
+              },
+            ),
           ),
         ));
   }

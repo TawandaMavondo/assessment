@@ -26,5 +26,5 @@ void setupServiceLocator() {
     },
   );
 
-  getIt.registerSingleton<CompanyService>(CompanyService());
+  // getIt.registerSingleton<CompanyService>(CompanyService());
 }

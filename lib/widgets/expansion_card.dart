@@ -1,4 +1,6 @@
 import 'package:assessment/dto/company_dto.dart';
+import 'package:assessment/utils/colors_to_gradient.dart';
+import 'package:assessment/utils/extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:iconsax/iconsax.dart';
@@ -19,7 +21,7 @@ class _ExpansionCardState extends State<ExpansionCard> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => context.push('/office/12'),
+      onTap: () => context.push('/office/view', extra: widget.dto),
       child: Card(
           margin: const EdgeInsets.all(16),
           color: Colors.white,
@@ -30,21 +32,15 @@ class _ExpansionCardState extends State<ExpansionCard> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SizedBox(
-                width: 10,
+                width: 16,
                 height: isExpanded ? 322 : 172,
                 child: Container(
                   height: double.infinity,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFF489DDA),
-                    gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        // end: Alignment.bottomCenter,
-                        colors: [
-                          Color(0xFF489DDA),
-                          Color(0xD9489DDA),
-                          Color(0x8C489DDA),
-                        ]),
-                    borderRadius: BorderRadius.only(
+                  decoration: BoxDecoration(
+                    // color: Color(0xFF489DDA),
+                    gradient:
+                        colorToGradient(HexColor.fromHex(widget.dto.color)),
+                    borderRadius: const BorderRadius.only(
                         topLeft: Radius.circular(16),
                         bottomLeft: Radius.circular(16)),
                   ),
@@ -58,7 +54,7 @@ class _ExpansionCardState extends State<ExpansionCard> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                         Text(
+                        Text(
                           widget.dto.name,
                           style: const TextStyle(
                             fontSize: 24,
@@ -71,7 +67,9 @@ class _ExpansionCardState extends State<ExpansionCard> {
                             size: 24,
                             color: Color(0xFF0D4477),
                           ),
-                          onPressed: () {},
+                          onPressed: () {
+                            context.push('/office/edit/', extra: widget.dto);
+                          },
                         ),
                       ],
                     ),
@@ -125,7 +123,7 @@ class _ExpansionCardState extends State<ExpansionCard> {
                         RichText(
                           text: TextSpan(
                               style: DefaultTextStyle.of(context).style,
-                              children:  [
+                              children: [
                                 const WidgetSpan(
                                   child: Icon(
                                     Icons.phone_outlined,
@@ -145,18 +143,18 @@ class _ExpansionCardState extends State<ExpansionCard> {
                         RichText(
                           text: TextSpan(
                               style: DefaultTextStyle.of(context).style,
-                              children: const [
-                                WidgetSpan(
+                              children: [
+                                const WidgetSpan(
                                   child: Icon(
                                     Icons.email_outlined,
                                     color: Color(0xFF0D4477),
                                   ),
                                 ),
-                                WidgetSpan(
+                                const WidgetSpan(
                                     child: SizedBox(
                                   width: 10,
                                 )),
-                                TextSpan(text: "info@specno.com")
+                                TextSpan(text: widget.dto.email)
                               ]),
                         ),
                         const SizedBox(
@@ -165,18 +163,20 @@ class _ExpansionCardState extends State<ExpansionCard> {
                         RichText(
                           text: TextSpan(
                               style: DefaultTextStyle.of(context).style,
-                              children: const [
-                                WidgetSpan(
+                              children: [
+                                const WidgetSpan(
                                   child: Icon(
                                     Iconsax.people,
                                     color: Color(0xFF0D4477),
                                   ),
                                 ),
-                                WidgetSpan(
+                                const WidgetSpan(
                                     child: SizedBox(
                                   width: 10,
                                 )),
-                                TextSpan(text: "Office Capacity: 25")
+                                TextSpan(
+                                    text:
+                                        "Office Capacity: ${widget.dto.capacity}"),
                               ]),
                         ),
                         const SizedBox(
@@ -185,19 +185,20 @@ class _ExpansionCardState extends State<ExpansionCard> {
                         RichText(
                           text: TextSpan(
                               style: DefaultTextStyle.of(context).style,
-                              children: const [
-                                WidgetSpan(
+                              children: [
+                                const WidgetSpan(
                                   child: Icon(
                                     Iconsax.location,
                                     color: Color(0xFF0D4477),
                                   ),
                                 ),
-                                WidgetSpan(
+                                const WidgetSpan(
                                     child: SizedBox(
                                   width: 10,
                                 )),
                                 TextSpan(
-                                    text: "10 Willie Van Schoor Dr, Bo Oakdale")
+                                  text: widget.dto.address,
+                                )
                               ]),
                         ),
                       ],
