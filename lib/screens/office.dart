@@ -1,12 +1,17 @@
 import 'package:assessment/dto/company_dto.dart';
+import 'package:assessment/dto/user_dto.dart';
+import 'package:assessment/service/user_service.dart';
+import 'package:assessment/utils/add_staff_member.dart';
 import 'package:assessment/utils/floating_action_button.dart';
+import 'package:assessment/widgets/avatar_picker.dart';
 import 'package:assessment/widgets/expansion_card.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
+import 'package:uuid/uuid.dart';
 
 class OfficeScreen extends StatefulWidget {
-
   final CompanyDTO dto;
   const OfficeScreen({super.key, required this.dto});
 
@@ -19,7 +24,7 @@ class _OfficeScreenState extends State<OfficeScreen> {
     PageController _controller = PageController();
     return showDialog<void>(
       context: context,
-      barrierDismissible: true, // user must tap button!
+      barrierDismissible: true,
       builder: (BuildContext context) {
         return LayoutBuilder(builder: (context, constraints) {
           return AlertDialog(
@@ -67,7 +72,11 @@ class _OfficeScreenState extends State<OfficeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButton: AppFloatingActionButton(
-        onPressed: () {},
+        onPressed: () {
+          setState(() {
+            addStaffMember(context, widget.dto);
+          });
+        },
       ),
       appBar: AppBar(
         centerTitle: true,
@@ -81,7 +90,7 @@ class _OfficeScreenState extends State<OfficeScreen> {
               horizontal: 10,
             ),
             child: Column(children: [
-              ExpansionCard(dto: widget.dto,navigatable:false),
+              ExpansionCard(dto: widget.dto, navigatable: false),
               const SizedBox(
                 height: 16,
               ),
@@ -109,7 +118,7 @@ class _OfficeScreenState extends State<OfficeScreen> {
                     ),
                   ),
                   Text(
-                    "11",
+                    "",
                     style: TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.w600,
@@ -121,29 +130,48 @@ class _OfficeScreenState extends State<OfficeScreen> {
               const SizedBox(
                 height: 20,
               ),
-              ListView.builder(
-                shrinkWrap: true,
-                itemCount: 5,
-                itemBuilder: (context, index) {
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 10.0),
-                    child: ListTile(
-                      title: Text(
-                        "Jacques Jordaan",
-                        style: TextStyle(fontSize: 18),
-                      ),
-                      leading: SvgPicture.asset('assets/images/avatar-1.svg'),
-                      trailing: IconButton(
-                        icon: Icon(Icons.more_vert_outlined),
-                        onPressed: () {
-                          _showEditDialog();
-                        },
-                      ),
-                      // trailing: const Icon(),
-                    ),
-                  );
-                },
-              ),
+              FutureBuilder<List<UserDto>>(
+                  future: UserService().getUsersByCompanyId(widget.dto.id),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    } else {
+                      if (snapshot.hasError) {
+                        return const Center(
+                          child: Text('Error fetching data'),
+                        );
+                      } else {
+                        return ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: snapshot.data?.length,
+                          itemBuilder: (context, index) {
+                            return Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 10.0),
+                              child: ListTile(
+                                title: Text(
+                                  snapshot.data![index].name,
+                                  style: const TextStyle(fontSize: 18),
+                                ),
+                                leading: SvgPicture.asset(
+                                  snapshot.data![index].avatar,
+                                ),
+                                trailing: IconButton(
+                                  icon: const Icon(Icons.more_vert_outlined),
+                                  onPressed: () {
+                                    // _showEditDialog();
+                                  },
+                                ),
+                                // trailing: const Icon(),
+                              ),
+                            );
+                          },
+                        );
+                      }
+                    }
+                  })
             ]),
           ),
         ),

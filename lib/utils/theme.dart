@@ -4,7 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 TextTheme inter = GoogleFonts.interTextTheme();
 
 ThemeData themeData = ThemeData(
-    colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue).copyWith(
+    colorScheme: ColorScheme.fromSeed(seedColor: Color(0xffF8FAFC)).copyWith(
      
     ),
     useMaterial3: true,
