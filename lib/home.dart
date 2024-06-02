@@ -1,5 +1,11 @@
+import 'package:assessment/service/company_service.dart';
+import 'package:assessment/utils/floating_action_button.dart';
 import 'package:assessment/widgets/expansion_card.dart';
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
+import 'package:go_router/go_router.dart';
+
+final getIt = GetIt.instance;
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -12,18 +18,10 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        floatingActionButton: SizedBox(
-          height: 64,
-          width: 64,
-          child: FloatingActionButton(
-            onPressed: () {},
-            shape: const CircleBorder(),
-            backgroundColor: const Color(0xFF0D4477),
-            child: const Icon(
-              Icons.add,
-              color: Colors.white,
-            ),
-          ),
+        floatingActionButton: AppFloatingActionButton(
+          onPressed: () {
+            context.push('/new/office');
+          },
         ),
         appBar: AppBar(
           titleSpacing: 12.5,
@@ -41,10 +39,27 @@ class _HomeScreenState extends State<HomeScreen> {
           padding: const EdgeInsets.only(
             top: 12,
           ),
-          child: ListView.builder(
-            itemCount: 10,
-            itemBuilder: (context, index) {
-              return ExpansionCard();
+          child: FutureBuilder(
+            future: getIt<CompanyService>().readCompanies(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              } else {
+                if (snapshot.hasError) {
+                  return const Center(
+                    child: Text('Error fetching data'),
+                  );
+                } else {
+                  return ListView.builder(
+                    itemCount: snapshot.data?.length,
+                    itemBuilder: (context, index) {
+                      return ExpansionCard(dto: snapshot.data![index]);
+                    },
+                  );
+                }
+              }
             },
           ),
         ));
