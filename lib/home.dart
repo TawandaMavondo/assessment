@@ -67,7 +67,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     return ListView.builder(
                       itemCount: snapshot.data?.length,
                       itemBuilder: (context, index) {
-                        return ExpansionCard(dto: snapshot.data![index]);
+                        return ExpansionCard(
+                          dto: snapshot.data![index],
+                          navigatable: true,
+                        );
                       },
                     );
                   }

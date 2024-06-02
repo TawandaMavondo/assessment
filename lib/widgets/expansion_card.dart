@@ -1,15 +1,21 @@
 import 'package:assessment/dto/company_dto.dart';
+import 'package:assessment/service/user_service.dart';
 import 'package:assessment/utils/colors_to_gradient.dart';
 import 'package:assessment/utils/extensions.dart';
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 import 'package:iconsax/iconsax.dart';
 
+final getIt = GetIt.instance;
+
 class ExpansionCard extends StatefulWidget {
   final CompanyDTO dto;
+  final bool navigatable;
   const ExpansionCard({
     super.key,
     required this.dto,
+    required this.navigatable,
   });
 
   @override
@@ -18,10 +24,24 @@ class ExpansionCard extends StatefulWidget {
 
 class _ExpansionCardState extends State<ExpansionCard> {
   bool isExpanded = false;
+  int staff = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    UserService().getUsersByCompanyId(widget.dto.id).then((value) {
+      setState(() {
+        staff = value.length;
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => context.push('/office/view', extra: widget.dto),
+      onTap: () => widget.navigatable
+          ? context.push('/office/view', extra: widget.dto)
+          : "",
       child: Card(
           margin: const EdgeInsets.all(16),
           color: Colors.white,
@@ -82,14 +102,14 @@ class _ExpansionCardState extends State<ExpansionCard> {
                         RichText(
                           text: TextSpan(
                               style: DefaultTextStyle.of(context).style,
-                              children: const [
+                              children: [
                                 TextSpan(
-                                  text: "5 ",
-                                  style: TextStyle(
+                                  text: "$staff ",
+                                  style: const TextStyle(
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                                TextSpan(
+                                const TextSpan(
                                   text: "Staff Members in Office",
                                   style: TextStyle(),
                                 )

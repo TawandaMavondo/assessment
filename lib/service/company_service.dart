@@ -26,4 +26,5 @@ class CompanyService {
   Future<int> deleteCompany(String id) async {
     return await _db.delete('companies', where: 'id = ?', whereArgs: [id]);
   }
+  
 }

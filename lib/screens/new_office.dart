@@ -21,7 +21,7 @@ class _NewOfficeScreenState extends State<NewOfficeScreen> {
   TextEditingController phoneNumberController = TextEditingController();
   TextEditingController memberCapacityController = TextEditingController();
 
-  late Color officeColor;
+  Color officeColor = Color(0xffFFBE0B);
 
   Future<void> addNewOffice() async {
     // Add new office to the database
@@ -127,7 +127,7 @@ class _NewOfficeScreenState extends State<NewOfficeScreen> {
                   height: 16,
                 ),
                 BlockPicker(
-                  pickerColor: Colors.blue,
+                  pickerColor: Color(0xffFFBE0B),
                   useInShowDialog: true,
                   availableColors: const [
                     Color(0xffFFBE0B),

@@ -81,7 +81,7 @@ class _OfficeScreenState extends State<OfficeScreen> {
               horizontal: 10,
             ),
             child: Column(children: [
-              ExpansionCard(dto: widget.dto),
+              ExpansionCard(dto: widget.dto,navigatable:false),
               const SizedBox(
                 height: 16,
               ),

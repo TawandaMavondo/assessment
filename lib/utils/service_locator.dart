@@ -1,4 +1,5 @@
 import 'package:assessment/service/company_service.dart';
+import 'package:assessment/service/user_service.dart';
 import 'package:get_it/get_it.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
@@ -26,5 +27,5 @@ void setupServiceLocator() {
     },
   );
 
-  // getIt.registerSingleton<CompanyService>(CompanyService());
+  // getIt.registerSingleton<UserService>(UserService());
 }
