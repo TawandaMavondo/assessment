@@ -20,6 +20,10 @@ class OfficeScreen extends StatefulWidget {
 }
 
 class _OfficeScreenState extends State<OfficeScreen> {
+  List<UserDto> users = [];
+
+  bool doItJustOnce = false;
+  List<UserDto> filteredList = [];
   Future<void> _showEditDialog() async {
     PageController _controller = PageController();
     return showDialog<void>(
@@ -68,6 +72,16 @@ class _OfficeScreenState extends State<OfficeScreen> {
     );
   }
 
+  void _search(String query) {
+    setState(() {
+      filteredList = users.where((user) {
+        var name = user.name.toLowerCase().split("").toSet();
+        var querySet = query.toLowerCase().split("").toSet();
+        return name.containsAll(querySet);
+      }).toList();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -98,6 +112,7 @@ class _OfficeScreenState extends State<OfficeScreen> {
                 elevation: MaterialStateProperty.all(0),
                 trailing: const [Icon(Icons.search)],
                 hintText: "Search",
+                onChanged: _search,
               ),
               const SizedBox(
                 height: 16,
@@ -133,6 +148,16 @@ class _OfficeScreenState extends State<OfficeScreen> {
               FutureBuilder<List<UserDto>>(
                   future: UserService().getUsersByCompanyId(widget.dto.id),
                   builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      users = snapshot.data!;
+                      if (!doItJustOnce) {
+                        //You should define a bool like (bool doItJustOnce = false;) on your state.
+                        users = snapshot.data!;
+                        filteredList = users;
+                        doItJustOnce =
+                            !doItJustOnce; //this line helps to do just once.
+                      }
+                    }
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return const Center(
                         child: CircularProgressIndicator(),
@@ -145,18 +170,18 @@ class _OfficeScreenState extends State<OfficeScreen> {
                       } else {
                         return ListView.builder(
                           shrinkWrap: true,
-                          itemCount: snapshot.data?.length,
+                          itemCount: filteredList.length,
                           itemBuilder: (context, index) {
                             return Padding(
                               padding:
                                   const EdgeInsets.symmetric(vertical: 10.0),
                               child: ListTile(
                                 title: Text(
-                                  snapshot.data![index].name,
+                                  filteredList[index].name,
                                   style: const TextStyle(fontSize: 18),
                                 ),
                                 leading: SvgPicture.asset(
-                                  snapshot.data![index].avatar,
+                                  filteredList[index].avatar,
                                 ),
                                 trailing: IconButton(
                                   icon: const Icon(Icons.more_vert_outlined),
